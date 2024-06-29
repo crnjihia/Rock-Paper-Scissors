@@ -1,5 +1,3 @@
-console.log("Hello World");
-
 // Function to get the computer's choice
 function getComputerChoice() {
   const choices = ["rock", "paper", "scissors"];
@@ -7,62 +5,67 @@ function getComputerChoice() {
   return choices[randomIndex];
 }
 
-// Function to get the human's choice
-function getHumanChoice() {
-  const choice = prompt("Please enter rock, paper, or scissors:");
-  return choice.toLowerCase();
-}
-
 // Function to play a single round
 function playRound(humanChoice, computerChoice) {
   humanChoice = humanChoice.toLowerCase();
 
+  const resultDisplay = document.getElementById("result");
+  if (!resultDisplay) {
+    console.error("Result display element not found.");
+    return;
+  }
+
+  let scoreDisplay = document.getElementById("score");
+  if (!scoreDisplay) {
+    console.error("Score display element not found.");
+    return;
+  }
+
   if (humanChoice === computerChoice) {
-    console.log("It's a tie!");
+    resultDisplay.textContent = "It's a tie!";
     return "tie";
   } else if (
     (humanChoice === "rock" && computerChoice === "scissors") ||
     (humanChoice === "scissors" && computerChoice === "paper") ||
     (humanChoice === "paper" && computerChoice === "rock")
   ) {
-    console.log(`You win! ${humanChoice} beats ${computerChoice}`);
+    resultDisplay.textContent = `You win! ${humanChoice} beats ${computerChoice}`;
     return "human";
   } else {
-    console.log(`You lose! ${computerChoice} beats ${humanChoice}`);
+    resultDisplay.textContent = `You lose! ${computerChoice} beats ${humanChoice}`;
     return "computer";
   }
 }
 
-// Function to play the entire game
-function playGame() {
-  let humanScore = 0;
-  let computerScore = 0;
-
-  for (let i = 0; i < 5; i++) {
-    const humanSelection = getHumanChoice();
-    const computerSelection = getComputerChoice();
-    const roundWinner = playRound(humanSelection, computerSelection);
-
-    if (roundWinner === "human") {
-      humanScore++;
-    } else if (roundWinner === "computer") {
-      computerScore++;
-    }
-
-    console.log(`Round ${i + 1}:`);
-    console.log(`Human: ${humanSelection}`);
-    console.log(`Computer: ${computerSelection}`);
-    console.log(`Scores -> Human: ${humanScore}, Computer: ${computerScore}`);
+// Function to update score
+function updateScore(winner) {
+  let scoreDisplay = document.getElementById("score");
+  if (!scoreDisplay) {
+    console.error("Score display element not found.");
+    return;
   }
 
-  if (humanScore > computerScore) {
-    console.log("Congratulations! You won the game.");
-  } else if (computerScore > humanScore) {
-    console.log("Sorry, you lost the game.");
-  } else {
-    console.log("The game is a tie.");
+  let [playerScore, computerScore] = scoreDisplay.textContent.match(/\d+/g);
+
+  if (winner === "human") {
+    playerScore++;
+  } else if (winner === "computer") {
+    computerScore++;
   }
+
+  scoreDisplay.textContent = `Player: ${playerScore} | Computer: ${computerScore}`;
 }
 
-// Start the game
-playGame();
+// Function to handle button clicks
+function handleButtonClick(event) {
+  const playerSelection = event.target.id;
+  const computerSelection = getComputerChoice();
+  const roundWinner = playRound(playerSelection, computerSelection);
+  updateScore(roundWinner);
+}
+
+// Add event listeners to buttons
+const buttons = document.querySelectorAll("button");
+buttons.forEach((button) => {
+  button.addEventListener("click", handleButtonClick);
+});
